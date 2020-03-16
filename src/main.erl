@@ -34,13 +34,3 @@ sumFloats (L) -> sumFloatsTail(L, 0).
 sumFloatsTail([], SUM) -> SUM;
 sumFloatsTail([H|T], SUM) -> sumFloatsTail(T, SUM+H).
 
-ONP([H]) ->
-
-
-%%  element(1, MyTuple). --- element 1 z tupla
-%%
-%%f(). - czyści wszystkie wiązania zmiennych.
-%%time(). Zwiąż zmienną o nazwie Minutki z aktualną minutą.
-%%list_to_tuple(ListaProduktow).
-%%io:format(„Produkt w sklepie nazywa się ~p.~nAktualna minutka to ~B.~n”, [NazwaP1, Minutki] ).
-% funcja stringa to integer
