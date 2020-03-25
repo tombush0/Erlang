@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
-%%% @author wokstym
-%%% @copyright (C) 2020, <COMPANY>
+%%% @author Grzegorz Poręba
+%%% @copyright (C) 2020, <agh.cs.wokstym>
 %%% @doc
 %%%
 %%% @end
