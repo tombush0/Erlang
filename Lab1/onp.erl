@@ -12,56 +12,48 @@
 %% API
 -export([onp/1]).
 
-onp([])-> 0;
+onp([]) -> 0;
 onp(Expression) ->
   Tokens = string:tokens(Expression, " "),
   try
-    io:format("~w~n",parse([], Tokens))
+    io:format("~w~n", parse([], Tokens))
   catch
     error:badarith -> io:format("Blad, bledne dzialanie (dzielenie przez 0 lub sqrt z liczby ujemnej lub tan ~n")
   end.
 
-
-get_head([H| _])-> H.
-get_second_el([H| T]) -> get_head(T).
+as_number(S) ->
+  case string:to_float(S) of
+    {error, no_float} -> list_to_integer(S);
+    {N, _} -> N
+  end.
 
 %% assuming always after operations is left one number
-parse(StackH , []) ->
+parse(StackH, []) ->
   StackH;
 %%assuming data is correct first element should be number
-parse([], [ArgsH|ArgsT]) ->
-  try
-    parse([list_to_float(ArgsH)], ArgsT)
-  catch
-    error:badarg ->
-      parse([list_to_integer(ArgsH)], ArgsT)
-  end;
-parse( Stack , [ArgsH|ArgsT]) when ArgsH ==  "*"->
-  parse([get_second_el(Stack) *get_head(Stack)]++ lists:nthtail(2, Stack), ArgsT);
-parse(Stack, [ArgsH|ArgsT]) when ArgsH ==  "/"->
-  parse([get_second_el(Stack) /get_head(Stack)]++ lists:nthtail(2, Stack), ArgsT);
-parse(Stack, [ArgsH|ArgsT]) when ArgsH ==  "+"->
-  parse([get_second_el(Stack) +get_head(Stack)]++ lists:nthtail(2, Stack), ArgsT);
-parse(Stack, [ArgsH|ArgsT]) when ArgsH ==  "-"->
-  parse([get_second_el(Stack) -get_head(Stack)]++ lists:nthtail(2, Stack), ArgsT);
-parse(Stack, [ArgsH|ArgsT]) when ArgsH ==  "sqrt"->
-  parse([math:sqrt(get_head(Stack)) ]++ lists:nthtail(1, Stack), ArgsT);
-parse(Stack, [ArgsH|ArgsT]) when ArgsH ==  "pow"->
-  parse([math:pow(get_second_el(Stack) ,get_head(Stack))]++ lists:nthtail(2, Stack), ArgsT);
-parse(Stack, [ArgsH|ArgsT]) when ArgsH ==  "sin"->
-  parse([math:sin(get_head(Stack)) ]++ lists:nthtail(1, Stack), ArgsT);
-parse(Stack, [ArgsH|ArgsT]) when ArgsH ==  "cos"->
-  parse([math:cos(get_head(Stack)) ]++ lists:nthtail(1, Stack), ArgsT);
-parse(Stack, [ArgsH|ArgsT]) when ArgsH ==  "tan"->
-  parse([math:tan(get_head(Stack)) ]++ lists:nthtail(1, Stack), ArgsT);
-parse(Stack, [ArgsH|ArgsT]) when ArgsH ==  "opp"->
-  parse([-get_head(Stack) ]++ lists:nthtail(1, Stack), ArgsT);
-parse(Stack, [ArgsH|ArgsT]) when ArgsH ==  "avg"->
-  parse([(get_second_el(Stack) +get_head(Stack))/2]++ lists:nthtail(2, Stack), ArgsT);
-parse(Stack, [ArgsH|ArgsT]) ->
-  try
-    parse([list_to_float(ArgsH)]++ Stack, ArgsT)
-  catch
-    error:badarg ->
-      parse([list_to_integer(ArgsH)]++ Stack, ArgsT)
-  end.
+parse([], [ArgsH | ArgsT]) ->
+  parse([as_number(ArgsH)], ArgsT);
+parse([First, Second | StackT], ["*" | ArgsT]) ->
+  parse([Second * First | StackT], ArgsT);
+parse([First, Second | StackT], ["/" | ArgsT]) ->
+  parse([Second / First | StackT], ArgsT);
+parse([First, Second | StackT], ["+" | ArgsT]) ->
+  parse([Second + First | StackT], ArgsT);
+parse([First, Second | StackT], ["-" | ArgsT]) ->
+  parse([Second - First | StackT], ArgsT);
+parse([StackH | StackT], ["sqrt" | ArgsT]) ->
+  parse([math:sqrt(StackH) | StackT], ArgsT);
+parse([First, Second | StackT], ["pow" | ArgsT]) ->
+  parse([math:pow(Second, First) | StackT], ArgsT);
+parse([StackH | StackT], ["sin" | ArgsT]) ->
+  parse([math:sin(StackH) | StackT], ArgsT);
+parse([StackH | StackT], ["cos" | ArgsT]) ->
+  parse([math:cos(StackH) | StackT], ArgsT);
+parse([StackH | StackT], ["tan" | ArgsT]) ->
+  parse([math:tan(StackH) | StackT], ArgsT);
+parse([StackH | StackT], ["opp" | ArgsT]) ->
+  parse([-StackH | StackT], ArgsT);
+parse([First, Second | StackT], ["avg" | ArgsT]) ->
+  parse([(Second + First) / 2 | StackT], ArgsT);
+parse(Stack, [ArgsH | ArgsT]) ->
+  parse([as_number(ArgsH) | Stack], ArgsT).
