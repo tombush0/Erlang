@@ -10,15 +10,19 @@
 -author("grzeg").
 
 %% API
--export([ addStation/2, addValue/4, removeValue/3, getOneValue/3, getStationMean/2, getDailyMean/2, getDailyOverLimit/4, getMeanOfEveryType/1,getMonitor/0, stop/0, start/0]).
--export([init/0]).
+-export([ addStation/2, addValue/4, removeValue/3, getOneValue/3, getStationMean/2, getDailyMean/2, getDailyOverLimit/4, getMeanOfEveryType/1,getMonitor/0, stop/0, start/0, start/1, swapMonitor/1]).
+-export([init/0, init/1]).
 
 
 start() ->
   register(pollutionServer, spawn(pollution_server, init, [])).
+start(Monitor) ->
+  register(pollutionServer, spawn(pollution_server, init, [Monitor])).
 
 init() ->
   loop(pollution:createMonitor()).
+init(Monitor) ->
+  loop(Monitor).
 
 addStation(Name, Coords) ->
   call(addStation, [Name, Coords]).
@@ -40,6 +44,8 @@ getMonitor() ->
   call(getMonitor, []).
 stop() ->
   call(stop, []).
+swapMonitor(NewMonitor) ->
+  call(swapMonitor, [NewMonitor]).
 
 call(Message, Args) ->
   pollutionServer ! {request, self(), Message, Args},
@@ -127,6 +133,9 @@ loop(Monitor) ->
     {request, Pid, getMonitor, _} ->
       Pid ! {reply, Monitor},
       loop(Monitor);
+    {request, Pid, swapMonitor, NewMonitor} ->
+      Pid ! {reply, ok},
+      loop(NewMonitor);
     {request, Pid, stop, _} ->
       Pid ! {reply, ok}
   end.
