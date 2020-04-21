@@ -1,8 +1,8 @@
 # Homework
 
-- [pollution_tests](../pollution_server/src/pollution_tests)
-- [pollution_server](../pollution_server/src/pollution_server)
-- [pollution_server_tests](../pollution_server/src/pollution_server_tests)
+- [pollution_tests](../pollution_server/src/pollution_tests.erl)
+- [pollution_server](../pollution_server/src/pollution_server.erl)
+- [pollution_server_tests](../pollution_server/src/pollution_server_tests.erl)
 
 
 # Raport
