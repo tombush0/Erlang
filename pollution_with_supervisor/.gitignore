@@ -1,5 +1,3 @@
-out
-.idea
 .rebar3
 _*
 .eunit
