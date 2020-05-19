@@ -81,7 +81,7 @@ getStationMean(NameOrCords, Type, Monitor) ->
         end end,
       {Sum, Nr} = maps:fold(SumAll, {0, 0}, Station#station.measurements),
       case catch Sum / Nr of
-        {'EXIT', {badarith,_}} -> -1;
+        {'EXIT', {badarith,_}} -> 0;
         N -> N
       end
   end.
